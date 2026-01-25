@@ -319,7 +319,7 @@ FlowchartBuilder.prototype = {
 						} catch( _g ) {
 							var err = haxe_Exception.caught(_g).unwrap();
 							window.alert("Error loading file: " + Std.string(err));
-							console.log("src/FlowchartBuilder.hx:394:",err);
+							console.log("src/FlowchartBuilder.hx:357:",err);
 						}
 					};
 					reader.readAsText(file);
