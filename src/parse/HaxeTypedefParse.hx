@@ -7,12 +7,12 @@ enum Token {
     TString(s:String);
     TInt(s:String);
     TFloat(s:String);
-    TSymbol(s:String); // { } ( ) ; : , . < > = ? -> etc.
+    TSymbol(s:String); 
     TEof;
 }
 
 class HaxeTypedefParse {
-    var src:String;
+    var src:String;o
     var pos:Int;
     var len:Int;
     var tokens:Array<Token>;
@@ -32,9 +32,9 @@ class HaxeTypedefParse {
         return parser.parseFile();
     }
 
-    // =========================================================================
-    // Tokenizer
-    // =========================================================================
+    
+    
+    
 
     function tokenize() {
         while (pos < len) {
@@ -45,21 +45,21 @@ class HaxeTypedefParse {
                 continue;
             }
 
-            // Comments
+            
             if (c == '/'.code) {
                 var next = src.charCodeAt(pos + 1);
                 if (next == '/'.code) {
-                    // Line comment
+                    
                     var start = pos;
                     pos += 2;
                     while (pos < len && src.charCodeAt(pos) != '\n'.code && src.charCodeAt(pos) != '\r'.code) {
                         pos++;
                     }
-                    // Extract potential doc?
-                    // For now, ignoring standard comments.
+                    
+                    
                     continue;
                 } else if (next == '*'.code) {
-                    // Block comment
+                    
                     var start = pos;
                     pos += 2;
                     var isDoc = (src.charCodeAt(pos) == '*'.code);
@@ -75,41 +75,41 @@ class HaxeTypedefParse {
                     if (!closed) throw "Unclosed comment at " + start;
                     
                     if (isDoc) {
-                        // Keep doc comments? 
-                        // Implementation choice: store parsed doc for next token
-                        // lastDoc = src.substring(start + 3, pos - 2); 
-                        // Simpler to just skip for now as per strict requirement to just parse structure.
+                        
+                        
+                        
+                        
                     }
                     continue;
                 }
             }
 
-            // Strings
+            
             if (c == '"'.code || c == '\''.code) {
                 tokens.push(readString(c));
                 continue;
             }
 
-            // Numbers
+            
             if (isDigit(c) || (c == '.'.code && isDigit(src.charCodeAt(pos+1)))) {
                 tokens.push(readNumber());
                 continue;
             }
 
-            // Identifiers
+            
             if (isIdentStart(c)) {
                 tokens.push(TId(readIdent()));
                 continue;
             }
 
-            // Symbols
-            // Check for multi-char symbols
+            
+            
             var char = src.charAt(pos);
             var next = (pos + 1 < len) ? src.charAt(pos + 1) : "";
             var two = char + next;
             var three = (pos + 2 < len) ? two + src.charAt(pos + 2) : "";
 
-            if (three == "..." || three == ">>>") { // spread, unsigned shift
+            if (three == "..." || three == ">>>") { 
                  tokens.push(TSymbol(three));
                  pos += 3;
                  continue;
@@ -124,7 +124,7 @@ class HaxeTypedefParse {
                 continue;
             }
             
-            // Single char symbols
+            
             if (";,(){}[]:.=<>?!+-*/%&|^~@".indexOf(char) != -1) {
                 tokens.push(TSymbol(char));
                 pos++;
@@ -138,7 +138,7 @@ class HaxeTypedefParse {
 
     function readString(quote:Int):Token {
         var start = pos;
-        pos++; // Skip opening quote
+        pos++; 
         var buf = new StringBuf();
         while (pos < len) {
             var c = src.charCodeAt(pos);
@@ -151,7 +151,7 @@ class HaxeTypedefParse {
                 if (pos >= len) throw "Unclosed string at " + start;
                 var esc = src.charCodeAt(pos);
                 pos++;
-                // Handle escapes roughly
+                
                 buf.addChar(esc); 
                 continue;
             }
@@ -169,13 +169,13 @@ class HaxeTypedefParse {
             if (isDigit(c)) {
                 pos++;
             } else if (c == '.'.code) {
-                if (dotFound) break; // second dot
-                // check if next is digit
+                if (dotFound) break; 
+                
                 if (pos + 1 < len && isDigit(src.charCodeAt(pos+1))) {
                      dotFound = true;
                      pos++;
                 } else {
-                    break; // dot not followed by digit (e.g. 1.toString)
+                    break; 
                 }
             } else if (c == 'e'.code || c == 'E'.code) {
                 pos++;
@@ -214,9 +214,9 @@ class HaxeTypedefParse {
     inline function isIdentPart(c:Int):Bool return isIdentStart(c) || isDigit(c);
 
 
-    // =========================================================================
-    // Parser
-    // =========================================================================
+    
+    
+    
 
     function peek():Token {
         return tokens[tokenIdx];
@@ -253,7 +253,7 @@ class HaxeTypedefParse {
         }
     }
 
-    // --- High level parsing ---
+    
 
     function parseFile():HaxeTypeDefinition {
         var imports:Array<String> = [];
@@ -273,17 +273,17 @@ class HaxeTypedefParse {
                     next();
                     imports.push(parsePath());
                     consume(";");
-                    // using?
+                    
                 case TId("using"):
                     next();
-                    // Just ignore using for structure parsing? Or treat as import?
-                    // Skipping for now, consuming path
+                    
+                    
                     parsePath();
                     consume(";");
                 case TId("class") | TId("interface") | TId("enum") | TId("typedef") | TId("abstract") | TId("final") | TId("extern") | TId("private") | TSymbol("@"):
                     types.push(parseType());
                 default:
-                     // Might be comments or other modifiers
+                     
                      throw "Unexpected token at top level: " + Std.string(t);
             }
         }
@@ -298,10 +298,10 @@ class HaxeTypedefParse {
     function parsePath():String {
         var parts = [consumeId()];
         while (match(".")) {
-            next(); // .
-            // Handle * for import
+            next(); 
+            
             if (match("*")) {
-                 next(); // *
+                 next(); 
                  parts.push("*");
                  break;
             }
@@ -312,18 +312,18 @@ class HaxeTypedefParse {
 
     function parseType():TypeInfo {
         var meta = parseMeta();
-        var doc = ""; // TODO: if we implement doc parsing
+        var doc = ""; 
         var isPrivate = false;
         var access = [];
 
-        // Modifiers before type keyword
+        
         while (true) {
             if (match("private")) {
                 next();
                 isPrivate = true;
             } else if (match("extern")) {
                 next();
-                // Access modifier for type? Not exactly standard but part of decl
+                
             } else if (match("final")) {
                 next();
             } else {
@@ -345,7 +345,7 @@ class HaxeTypedefParse {
         var parent:String = null;
         var interfaces:Array<String> = [];
 
-        // Inheritance / Implementation
+        
         while (true) {
             if (match("extends")) {
                 next();
@@ -354,9 +354,9 @@ class HaxeTypedefParse {
                 next();
                 interfaces.push(parseComplexType());
             } else if (match("from") || match("to")) {
-                 // abstract from/to
+                 
                  next();
-                 parseComplexType(); // Ignore for now, just consume
+                 parseComplexType(); 
             } else {
                 break;
             }
@@ -366,15 +366,15 @@ class HaxeTypedefParse {
 
         if (kind == TTypedef) {
              consume("=");
-             // Typedef can be complex structure or just alias
+             
              if (match("{")) {
-                  // Structure
+                  
                   fields = parseFields(false);
              } else {
-                 // Alias
+                 
                  var alias = parseComplexType();
-                 // We treat alias as a single field or special representation?
-                 // For now, if it's not a structure, fields is empty.
+                 
+                 
              }
              if (match(";")) consume(";");
         } else {
@@ -385,7 +385,7 @@ class HaxeTypedefParse {
             kind: kind,
             name: name,
             params: params,
-            path: name, // Will be prefixed with package later if needed
+            path: name, 
             parent: parent,
             interfaces: interfaces,
             fields: fields,
@@ -399,15 +399,15 @@ class HaxeTypedefParse {
     function parseFields(expectBraces:Bool):Array<FieldInfo> {
         if (expectBraces) consume("{");
         else {
-             if (match("{")) next(); else return []; // should trigger if not Brace
+             if (match("{")) next(); else return []; 
         }
 
         var fields:Array<FieldInfo> = [];
         
         while (!match("}") && peek() != TEof) {
-            // Parse member
+            
             fields.push(parseField());
-            // Optional semicolon?
+            
             if (match(";")) next();
         }
         
@@ -420,7 +420,7 @@ class HaxeTypedefParse {
         var doc = "";
         var access:Array<Access> = [];
         
-        // Access modifiers
+        
         while (true) {
             if (match("public")) { next(); access.push(APublic); }
             else if (match("private")) { next(); access.push(APrivate); }
@@ -442,12 +442,12 @@ class HaxeTypedefParse {
             next();
             kind = "var";
         } else {
-            // Identifier only (enum constructor or typedef field)
-            // If we are in class, var/function is required usually, but typedef/enum don't have them
-            kind = "var"; // Default assumption for typedef/enum
+            
+            
+            kind = "var"; 
         }
         
-        // For constructor "new"
+        
         var name = "";
         if (match("new")) {
              name = "new";
@@ -459,16 +459,16 @@ class HaxeTypedefParse {
         var type:String = null;
         var methodInfo:MethodInfo = null;
         
-        // Type params for method?
+        
         var methodParams = parseTypeParams();
 
         if (kind == "function" || (kind == "var" && match("("))) {
-             // It is a method
+             
              kind = "function";
              methodInfo = parseMethodSignature();
         }
 
-        // Return type or Variable type
+        
         if (match(":")) {
             next();
             type = parseComplexType();
@@ -477,12 +477,12 @@ class HaxeTypedefParse {
             }
         }
 
-        // Implementation / Value
+        
         if (match("=")) {
             next();
             skipExpression();
         } else if (match("{") && kind == "function") {
-            // Function body
+            
             skipBlock();
         }
         
@@ -521,7 +521,7 @@ class HaxeTypedefParse {
                 
                 if (match("=")) {
                     next();
-                    // Capture default value as string, simple expression
+                    
                     val = captureExpression();
                 }
                 
@@ -539,7 +539,7 @@ class HaxeTypedefParse {
         consume(")");
         return {
             args: args,
-            ret: "Void" // Default
+            ret: "Void" 
         };
     }
 
@@ -548,7 +548,7 @@ class HaxeTypedefParse {
         while (match("@")) {
             next();
             var name = "";
-            if (match(":")) { // @:native
+            if (match(":")) { 
                 next();
                 name = ":" + consumeId();
             } else {
@@ -573,7 +573,7 @@ class HaxeTypedefParse {
         if (match("<")) {
             var start = tokenIdx;
             next();
-            // Count nesting for >
+            
             var depth = 1;
             while (depth > 0 && peek() != TEof) {
                 var t = next();
@@ -583,24 +583,24 @@ class HaxeTypedefParse {
                     default:
                 }
             }
-            // Reconstruct the string for params?
-            // Or just return names?
-            // For now return dummy or reconstruction.
-            // Simplification: just extracting names is hard if we just skipped tokens.
-            // Let's iterate properly if we want the names.
-            // But spec says "get the types...".
-            // Since `parseTypeParams` in `TypeInfo` is just `Array<String>`, I'll assume it wants generic param names like "T", "K".
+            
+            
+            
+            
+            
+            
+            
             return ["TODO_GENERIC_PARAMS"]; 
         }
         return [];
     }
     
-    // Parses a type reference like "Map<String, Int>" or "String" or "{ x: Int }"
+    
     function parseComplexType():String {
-        // This is tricky because of function types A->B and anonymous structures { x:Int }
-        // We will capture tokens until we hit a delimiter that ends the type
-        // Delimiters: , (in args), ; (end of statement), = (init), { (body start), ) (end of args), } (end of struct)
-        // But we must respect nesting of <...>, (...), {...}
+        
+        
+        
+        
         
         var depthParen = 0;
         var depthAngle = 0;
@@ -614,7 +614,7 @@ class HaxeTypedefParse {
             switch (t) {
                 case TId(id): s = id;
                 case TSymbol(sym): s = sym;
-                case TString(str): s = '"' + str + '"'; // Literal types?
+                case TString(str): s = '"' + str + '"'; 
                 case TInt(i): s = i;
                 case TFloat(f): s = f;
                 default:
@@ -623,10 +623,10 @@ class HaxeTypedefParse {
             if (depthParen == 0 && depthAngle == 0 && depthBrace == 0) {
                  if (s == ";" || s == "=" || s == "{" || s == "," || s == "}" || s == ")") {
                       if (s == "{" && parts.length == 0) {
-                           // Anonymous structure type starting with {
-                           // Allow it.
+                           
+                           
                       } else if (s == "->" && parts.length > 0) {
-                           // Function type continuation
+                           
                       } else {
                           break;
                       }
@@ -645,10 +645,10 @@ class HaxeTypedefParse {
             else if (s == "}") depthBrace--;
         }
         
-        return parts.join(" "); // Rough reconstruction
+        return parts.join(" "); 
     }
 
-    // Skip { ... }
+    
     function skipBlock() {
         if (!match("{")) return;
         next();
@@ -663,8 +663,8 @@ class HaxeTypedefParse {
         }
     }
 
-    // Skip expression until ; or , or ) (context dependent)
-    // Used for variable initialization
+    
+    
     function skipExpression() {
         var depthBrace = 0;
         var depthParen = 0;
@@ -688,7 +688,7 @@ class HaxeTypedefParse {
         }
     }
     
-    // Capture expression tokens as string
+    
     function captureExpression():String {
          var parts:Array<String> = [];
          var depthBrace = 0;
