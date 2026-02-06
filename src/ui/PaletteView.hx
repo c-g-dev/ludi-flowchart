@@ -45,7 +45,7 @@ class PaletteView {
             .palette-tab {
                 padding: 5px 10px;
                 cursor: pointer;
-                color: #888;
+                color: white;
                 font-size: 0.9em;
                 border-bottom: 2px solid transparent;
                 user-select: none;

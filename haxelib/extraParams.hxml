@@ -1,0 +1,4 @@
+-lib ludi-commons
+-lib uuid
+-lib ludi-compose
+--macro FlowchartInit.init()

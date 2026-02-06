@@ -13,6 +13,14 @@ class Graph<V,E> {
         return edges.filter(function(e) return e.source == node || e.target == node);
     }
 
+    public function incoming(node:V):Array<GraphConnection<V,E>> {
+        return edges.filter(function(e) return e.target == node);
+    }
+
+    public function outgoing(node:V):Array<GraphConnection<V,E>> {
+        return edges.filter(function(e) return e.source == node);
+    }
+
     public function neighbors(node:V):Array<V> {
         return adjacent(node).map(function(e) return e.source == node ? e.target : e.source);
     }

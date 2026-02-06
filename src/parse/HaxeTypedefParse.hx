@@ -12,7 +12,7 @@ enum Token {
 }
 
 class HaxeTypedefParse {
-    var src:String;o
+    var src:String;
     var pos:Int;
     var len:Int;
     var tokens:Array<Token>;

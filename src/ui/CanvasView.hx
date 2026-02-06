@@ -48,6 +48,9 @@ class CanvasView {
     public var selectedNoteId:String = null;
     public var selectedConnection:GraphConnection<FlowchartNode, FlowchartConnection> = null;
 
+    public dynamic function onNodeSelected(node:FlowchartNode) {}
+    public dynamic function onSelectionCleared() {}
+
     public dynamic function onNodeCreate(templateName:String, x:Float, y:Float) {}
     public dynamic function onEditNode(node:FlowchartNode) {}
     public dynamic function onEditConnection(edge:GraphConnection<FlowchartNode, FlowchartConnection>) {}
@@ -157,7 +160,10 @@ class CanvasView {
             isDraggingNote = true;
             dragNoteId = note.id;
             selectedNoteId = note.id;
-            selectedNodeId = null;
+            if (selectedNodeId != null) {
+                selectedNodeId = null;
+                onSelectionCleared();
+            }
             selectedConnection = null;
             dragStartX = mx;
             dragStartY = my;
@@ -175,7 +181,10 @@ class CanvasView {
                  connStartNodeId = node.id;
                  mouseX = worldX;
                  mouseY = worldY;
-                 selectedNodeId = null;
+                 if (selectedNodeId != null) {
+                     selectedNodeId = null;
+                     onSelectionCleared();
+                 }
                  selectedNoteId = null;
                  selectedConnection = null;
                  return;
@@ -184,7 +193,12 @@ class CanvasView {
             // Otherwise Drag
             isDraggingNode = true;
             dragNodeId = node.id;
-            selectedNodeId = node.id;
+            
+            if (selectedNodeId != node.id) {
+                selectedNodeId = node.id;
+                onNodeSelected(node);
+            }
+            
             selectedNoteId = null;
             selectedConnection = null;
             dragStartX = mx;
@@ -198,13 +212,19 @@ class CanvasView {
         var conn = getConnectionAt(worldX, worldY);
         if (conn != null) {
              selectedConnection = conn;
-             selectedNodeId = null;
+             if (selectedNodeId != null) {
+                 selectedNodeId = null;
+                 onSelectionCleared();
+             }
              selectedNoteId = null;
              return;
         }
 
         // 4. Background click (Pan start)
-        selectedNodeId = null;
+        if (selectedNodeId != null) {
+            selectedNodeId = null;
+            onSelectionCleared();
+        }
         selectedNoteId = null;
         selectedConnection = null;
         isPanning = true;

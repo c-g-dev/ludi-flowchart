@@ -1,7 +1,7 @@
 {
   "name": "ludi-flowchart",
   "url" : "https://github.com/c-g-dev/ludi-flowchart",
-  "description": "A flowcharting application designed to compile flowcharts into runtime code.",
+  "description": "A visual programming application designed to compile flowcharts into runtime code.",
   "license": "MIT",
   "tags": [
     "flowchart",
@@ -12,7 +12,7 @@
   "contributors": [
     "cgdev"
   ],
-  "releasenote": "Initial release",
-  "version": "0.0.1",
+  "releasenote": "Add optional playback system",
+  "version": "0.0.2",
   "dependencies": {}
 }

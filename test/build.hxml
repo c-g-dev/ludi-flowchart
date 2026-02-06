@@ -1,0 +1,8 @@
+-lib ludi-commons
+-lib uuid
+-lib ludi-flowchart
+-lib ludi-compose
+-main Demo
+-js demo.js
+-dce full
+-debug

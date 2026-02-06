@@ -5,7 +5,7 @@ import model.FlowchartNode;
 import model.FlowchartConnection;
 import model.NodeTemplate;
 
-class FlowchartSerializer {
+class FlowchartSerializer implements IFlowchartSerializer {
     
     public function new() {
     }
