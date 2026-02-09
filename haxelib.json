@@ -12,7 +12,7 @@
   "contributors": [
     "cgdev"
   ],
-  "releasenote": "Add optional playback system",
-  "version": "0.0.3",
+  "releasenote": "Embed resources",
+  "version": "0.0.4",
   "dependencies": {}
 }

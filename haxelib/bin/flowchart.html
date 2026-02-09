@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowchart Builder</title>
+    <link rel="stylesheet" href="flowchart_style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app-container">
+        <aside id="sidebar" class="flowchart-sidebar">
+            <h2>Nodes</h2>
+            <div id="palette">
+                <!-- Palette items will be injected here -->
+            </div>
+            <div id="controls">
+                <button id="btn-save">Save JSON</button>
+                <button id="btn-load">Load JSON</button>
+                <input type="file" id="file-input" style="display: none;" accept=".json">
+                <button id="btn-options">Options</button>
+                <button id="btn-add-note">Add Note</button>
+                <button id="btn-preview">Preview</button>
+            </div>
+        </aside>
+        <main id="workspace">
+            <canvas id="flowchart-canvas"></canvas>
+        </main>
+    </div>
+
+    <dialog id="node-editor">
+        <form method="dialog">
+            <h3>Edit Node</h3>
+            <div id="editor-fields">
+                <!-- Dynamic fields -->
+            </div>
+            <div class="dialog-actions">
+                <button value="cancel">Cancel</button>
+                <button id="btn-confirm" value="confirm">Save</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="preview-dialog">
+        <form method="dialog">
+            <h3 id="preview-title">Preview</h3>
+            <div id="preview-content">
+                <!-- content goes here -->
+            </div>
+            <div class="dialog-actions">
+                <button value="close">Close</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="options-dialog">
+        <form method="dialog">
+            <h3>Options</h3>
+            <div id="options-fields">
+                <!-- Dynamic fields -->
+            </div>
+            <div class="dialog-actions">
+                <button value="cancel">Cancel</button>
+                <button id="btn-options-confirm" value="confirm">Save</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
