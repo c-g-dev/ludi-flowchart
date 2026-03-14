@@ -5,9 +5,6 @@ import ludi.flowchart.model.FlowchartNode;
 import ludi.flowchart.model.FlowchartConnection;
 import ludi.flowchart.model.Note;
 import ludi.flowchart.model.NodeTemplate;
-#if hxnodejs
-import js.node.Fs;
-#end
 import js.Browser;
 import js.html.FileReader;
 import js.html.InputElement;
@@ -15,25 +12,16 @@ import js.html.Blob;
 import js.html.URL;
 import js.html.AnchorElement;
 
-class DefaultFlowchartOps implements IFlowchartOps {
+class BrowserFlowchartOps implements IFlowchartOps {
     
     public function new() {}
 
     public function tryLoadText(path:String):Null<String> {
-        #if hxnodejs
-        if (Fs.existsSync(path)) {
-            return Fs.readFileSync(path, "utf8");
-        }
-        #end
         return null;
     }
 
     public function exists(path:String):Bool {
-        #if hxnodejs
-        return Fs.existsSync(path);
-        #else
         return false;
-        #end
     }
 
     public function saveFlowchart(graph:Graph<FlowchartNode, FlowchartConnection>, notes:Array<Note>, ?onComplete:Void->Void):Void {
@@ -44,8 +32,7 @@ class DefaultFlowchartOps implements IFlowchartOps {
                 template: node.template,
                 x: node.x,
                 y: node.y,
-                data: mapToDynamic(node.data),
-                ownerNodeId: node.ownerNodeId
+                data: mapToDynamic(node.data)
             }),
             edges: graph.edges.map(function(e) return {
                 sourceId: e.source.id,
@@ -70,7 +57,7 @@ class DefaultFlowchartOps implements IFlowchartOps {
     public function requestLoadFlowchart(templates:Array<NodeTemplate>, onLoaded:(Graph<FlowchartNode, FlowchartConnection>, Array<Note>)->Void):Void {
         var fileInput:InputElement = cast Browser.document.getElementById("file-input");
         if (fileInput == null) {
-            // Create if not exists (fallback)
+            // Create if not exists
             fileInput = Browser.document.createInputElement();
             fileInput.type = "file";
             fileInput.id = "file-input";
@@ -78,7 +65,6 @@ class DefaultFlowchartOps implements IFlowchartOps {
             Browser.document.body.appendChild(fileInput);
         }
 
-        // Remove old listener to avoid duplicates if possible, or just set onchange
         fileInput.onchange = function(e) {
             if (fileInput.files.length > 0) {
                 var file = fileInput.files[0];
@@ -98,8 +84,8 @@ class DefaultFlowchartOps implements IFlowchartOps {
                                 var templateName = nData.template.name;
                                 var template = findTemplate(templates, templateName);
                                 if (template != null) {
-                                    var ownerNodeId:String = nData.ownerNodeId;
-                                    var node = new FlowchartNode(nData.id, template, nData.x, nData.y, ownerNodeId);
+                                    var node = new FlowchartNode(nData.id, template, nData.x, nData.y);
+                                    // Restore data
                                     var dataMap:Dynamic = normalizeNodeData(nData.data);
                                     for (field in Reflect.fields(dataMap)) {
                                         node.data.set(field, Reflect.field(dataMap, field));
